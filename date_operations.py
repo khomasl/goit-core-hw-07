@@ -1,4 +1,7 @@
-from datetime import date, timedelta
+from datetime import datetime, date, timedelta
+
+def string_to_date(string):
+    return datetime.strptime(string, "%d.%m.%Y").date()
 
 def date_to_string(date):
     return date.strftime("%d.%m.%Y")
@@ -19,7 +22,7 @@ def get_upcoming_birthdays(contacts, days=7):
     today = date.today()
     
     for contact in contacts:
-        birthday_this_year = contact["birthday"].replace(year=today.year)
+        birthday_this_year = string_to_date(contact["birthday"]).replace(year=today.year)
 
         """
         Додайте на цьому місці перевірку, чи не буде 

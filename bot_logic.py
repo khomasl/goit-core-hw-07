@@ -1,6 +1,6 @@
-from collections import UserDict
 from datetime import datetime
-import re
+from colorama import Fore, Style
+from collections import UserDict
 from date_operations import get_upcoming_birthdays as get_birthdays
 
 class Field:
@@ -26,11 +26,8 @@ class Phone(Field):
 class Birthday(Field):
     def __init__(self, value):
         try:
-            # Додайте перевірку коректності даних
-            pattern = r"\d{2}\.\d{2}\.\d{4}"
-            re.search(pattern, value)
-            # та перетворіть рядок на об'єкт datetime
-            self.value = datetime.strptime(value, "%d.%m.%Y").date()
+            datetime.strptime(value, "%d.%m.%Y").date()
+            self.value = value
         except ValueError:
             raise ValueError("Invalid date format. Use DD.MM.YYYY")
             
@@ -64,7 +61,7 @@ class Record:
         self.birthday = Birthday(birthday)
 
     def __str__(self):
-        return f"Contact name: {self.name.value}, birthday: {self.birthday}, phones: {'; '.join(p.value for p in self.phones)}"
+        return Fore.YELLOW + f"Contact name: {self.name.value}, birthday: {self.birthday}, phones: {'; '.join(p.value for p in self.phones)}" + Style.RESET_ALL
 
 class AddressBook(UserDict):
     def add_record(self, record: Record):
@@ -88,9 +85,15 @@ class AddressBook(UserDict):
 
 
     def __str__(self):
-        lines = "  Address Book\nName    Phones\n" 
-        for name, numbers in self.data.items():
-            # birthday = self.data[name].birthday.value if self.data[name].birthday else ''
-            lines += f"{name}: {'; '.join(p_n.value for p_n in numbers.phones)}\n"
-
-        return lines
+        # lines = "     Address Book\nName   Birthday    Phones\n" 
+        # for name, record in self.data.items():
+        #     birthday = record.birthday.value if record.birthday else ' '*10
+        #     lines += f"{name}: {birthday}  {'; '.join(pone.value for pone in record.phones)}\n"
+        
+        # return lines
+        
+        print(Style.BRIGHT + "       Address Book" + Style.RESET_ALL)
+        for name, record in self.data.items():
+            print(record)
+        
+        return ''   

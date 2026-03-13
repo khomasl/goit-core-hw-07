@@ -1,13 +1,19 @@
+from colorama import Fore, Style
 from bot_logic import AddressBook, Record
+
+def stylized_text(text, color=Fore.GREEN):
+    return color + text + Style.RESET_ALL
 
 def input_error(func):
     def inner(*args, **kwargs):
         try:
             return func(*args, **kwargs)
-        except IndexError:
-            return "Enter user name."
-        except ValueError:
-            return "Give me name and phone please or added name."  
+        except IndexError as err:
+            return stylized_text(f"❌ {err}. Enter user name.", Fore.RED)
+        except ValueError as err:
+            return stylized_text(f"❌ {err}. Give me name and phone please or added name.", Fore.RED)  
+        except AttributeError as err:
+            return stylized_text(f"❌ Name '{args[0][0]}' - not found", Fore.RED)
     return inner
 
 @input_error
@@ -16,40 +22,32 @@ def parse_input(user_input):
     cmd = cmd.strip().lower()
     return cmd, *args
 
-
 @input_error
 def add_contact(args, book: AddressBook):
     name, phone, *_ = args
     record = book.find(name)
-    message = "Contact updated."
+    message = "✅ Contact updated."
     if record is None:
         record = Record(name)
         book.add_record(record)
-        message = "Contact added."
+        message = "✅ Contact added."
     if phone:
         record.add_phone(phone)
-    return message
-
+    return stylized_text(message)
 
 @input_error
 def change_contact(args, book: AddressBook):
     name, old_phone, new_phone, *_ = args
     record = book.find(name)
-    if record is None:
-        return f"Name '{name}' - not found"
     record.edit_phone(old_phone, new_phone)
-    return "Contact updated."
-
+    return stylized_text("✅ Contact updated.")
 
 @input_error
 def show_phone(args, book: AddressBook):
     name, *_ = args
     record = book.find(name)
-    if record is None:
-        return f"Name '{name}' - not found"
     phones = record.find_phones()
     return phones
-
 
 def show_all(book: AddressBook):
     return book
@@ -58,20 +56,16 @@ def show_all(book: AddressBook):
 def add_birthday(args, book: AddressBook):
     name, birthday, *_ = args
     record = book.find(name)
-    if record is None:
-        return f"Name '{name}' - not found"
     record.add_birthday(birthday)
-    return "Birthday added."
+    return stylized_text("✅ Birthday added.")
 
 @input_error
 def show_birthday(args, book: AddressBook):
     name, *_ = args
     record = book.find(name)
-    if record is None:
-        return f"Name '{name}' - not found"
     if record.birthday is None:
         return None
-    return record.birthday.value
+    return stylized_text(record.birthday.value)
 
 @input_error
 def birthdays(args, book: AddressBook):
@@ -80,18 +74,18 @@ def birthdays(args, book: AddressBook):
 
 def main():
     book = AddressBook()
-
-    print("Welcome to the assistant bot!", end="")
+    
+    print(stylized_text("👋 Welcome to the assistant bot! 🤖", Style.BRIGHT), end="")
     while True:
-        user_input = input("\nEnter a command: ")
+        user_input = input(stylized_text("\nEnter a command: ", Fore.CYAN))
         command, *args = parse_input(user_input)
 
         if command in ["close", "exit"]:
-            print("Good bye!")
+            print(stylized_text("Good bye! 👋", Style.BRIGHT))
             break
 
         elif command == "hello":
-            print("How can I help you?")
+            print(stylized_text("How can I help you?"))
         elif command == "add":
             print(add_contact(args, book))
         elif command == "change":
@@ -108,7 +102,7 @@ def main():
             print(birthdays(args, book))
 
         else:
-            print("Invalid command.")
+            print(stylized_text("❌ Invalid command.", Fore.RED))
 
 
 if __name__ == "__main__":
