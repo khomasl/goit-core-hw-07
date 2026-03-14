@@ -90,10 +90,8 @@ class AddressBook(UserDict):
         #     birthday = record.birthday.value if record.birthday else ' '*10
         #     lines += f"{name}: {birthday}  {'; '.join(pone.value for pone in record.phones)}\n"
         
-        # return lines
-        
-        print(Style.BRIGHT + "       Address Book" + Style.RESET_ALL)
+        lines = Style.BRIGHT + "       Address Book\n" + Style.RESET_ALL
         for name, record in self.data.items():
-            print(record)
+            lines += f"{record}\n"
         
-        return ''   
+        return lines
